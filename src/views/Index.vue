@@ -1,6 +1,5 @@
 <template>
   <div class="home">
-<<<<<<< HEAD
     <div class="row gap-4 my-4 ms-4">
       <div style="width: 300px" v-for="item of getTest" :key="item._id">
         <router-link :to="`/test/${item._id}`">
@@ -63,13 +62,6 @@
           </button>
         </form>
       </div>
-=======
-    <h1 class="mt-4">Aktiv Testlar</h1>
-    <div style="width: 300px">
-      <router-link to="/test" style="text-decoration: none">
-        <testCard />
-      </router-link>
->>>>>>> 4ffa917255d121100f607d540ff8c715efeb7502
     </div>
   </div>
 </template>
@@ -81,7 +73,6 @@ export default {
   components: {
     testCard,
   },
-<<<<<<< HEAD
   data() {
     return {
       formActive: false,
@@ -134,9 +125,3 @@ export default {
   display: flex !important;
 }
 </style>
-=======
-};
-</script>
-
-<style scoped></style>
->>>>>>> 4ffa917255d121100f607d540ff8c715efeb7502
