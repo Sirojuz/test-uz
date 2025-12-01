@@ -1,14 +1,14 @@
 <template>
   <div class="card">
     <div class="card-body">
-      <figure>
-        <blockquote class="blockquote">
+      <div>
+        <div class="blockquote">
           <p>Agrobiyologiyalar fani</p>
-        </blockquote>
-        <figcaption class="blockquote-footer">
-          Yakuniy nazorat uchun test
-        </figcaption>
-      </figure>
+        </div>
+        <div class="blockquote-footer">
+          <span>Yakuniy nazorat uchun test</span>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -30,5 +30,8 @@ export default {};
 }
 .link {
   text-decoration: none !important;
+}
+.blockquote p {
+  color: #2c3e50;
 }
 </style>
