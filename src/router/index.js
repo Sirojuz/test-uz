@@ -24,7 +24,7 @@ const routes = [
         meta: { auth: true },
       },
       {
-        path: "/result",
+        path: "/result/:id",
         name: "result",
         component: Result,
         meta: { auth: true },
