@@ -17,7 +17,8 @@
                 id="file-upload"
                 type="file"
                 style="display: none"
-                @change="handleFileSelect" />
+                @change="handleFileSelect"
+              />
             </div>
 
             <!-- RANDOM COUNT INPUT -->
@@ -26,7 +27,8 @@
               class="form-control"
               placeholder="Testlar soni"
               v-model="randomCount"
-              style="width: 125px" />
+              style="width: 125px"
+            />
 
             <!-- YUBORISH BUTTON -->
             <button class="btn btn-success" @click="uploadTestFile">
@@ -51,7 +53,8 @@
       <div
         class="d-flex flex-column mt-4"
         v-for="(item, qIndex) in randomTests"
-        :key="item._id">
+        :key="item._id"
+      >
         <div class="question d-flex flex-column mb-4 align-items-start">
           <h3>{{ qIndex + 1 }}. {{ item.question }}</h3>
 
@@ -62,7 +65,8 @@
                   type="radio"
                   :name="'question_' + qIndex"
                   :value="optIndex"
-                  v-model="userAnswers[qIndex]" />
+                  v-model="userAnswers[qIndex]"
+                />
                 {{ option }}
               </label>
             </div>
@@ -96,6 +100,28 @@ export default {
 
   methods: {
     // START TEST (backend attempt)
+    // startExam() {
+    //   let studentId = localStorage.getItem("demoStudentId");
+    //   if (!studentId) {
+    //     studentId = "demo_" + Math.random().toString(36).substring(2, 10);
+    //     localStorage.setItem("demoStudentId", studentId);
+    //   }
+
+    //   this.axios
+    //     .get("http://localhost:3000/api/testOne/start", {
+    //       params: {
+    //         studentId,
+    //         testId: this.id,
+    //       },
+    //     })
+    //     .then((res) => {
+    //       this.randomTests = res.data.questions;
+    //       this.attemptId = res.data.attemptId;
+    //       localStorage.setItem("attemptId", this.attemptId);
+    //       this.userAnswers = new Array(this.randomTests.length).fill(null);
+    //     })
+    //     .catch((err) => console.log(err));
+    // },
     startExam() {
       let studentId = localStorage.getItem("demoStudentId");
       if (!studentId) {
@@ -104,21 +130,19 @@ export default {
       }
 
       this.axios
-        .get("http://localhost:3000/api/testOne/start", {
-          params: {
-            studentId,
-            testId: this.id,
-          },
+        .post("http://localhost:3000/api/attempt/start", {
+          studentId,
+          testId: this.id,
         })
         .then((res) => {
           this.randomTests = res.data.questions;
           this.attemptId = res.data.attemptId;
-
           this.userAnswers = new Array(this.randomTests.length).fill(null);
         })
-        .catch((err) => console.log(err));
+        .catch((err) => {
+          console.log("Start attempt error:", err);
+        });
     },
-
     // WORD FILE UPLOAD (randomCount yuboriladi)
     handleFileSelect(event) {
       this.selectedFile = event.target.files[0];
@@ -161,56 +185,43 @@ export default {
         })
         .catch((err) => console.log(err));
     },
-    // finishExam() {
-    //   let correct = 0;
-    //   for (let i = 0; i < this.randomTests.length; i++) {
-    //     if (this.userAnswers[i] === this.randomTests[i].correctIndex) {
-    //       correct++;
-    //     }
-    //   }
-
-    //   const total = this.randomTests.length;
-    //   const wrong = total - correct;
-    //   const percent = Math.round((correct / total) * 100);
-
-    //   let grade = 2;
-    //   if (percent >= 86) grade = 5;
-    //   else if (percent >= 71) grade = 4;
-    //   else if (percent >= 50) grade = 3;
-
-    //   localStorage.setItem(
-    //     "examResult",
-    //     JSON.stringify({ correct, wrong, total, percent, grade })
-    //   );
-
-    //   this.$router.push("/result");
-    // },
     finishExam() {
       let correct = 0;
 
       for (let i = 0; i < this.randomTests.length; i++) {
-        if (this.userAnswers[i] === this.randomTests[i].correctIndex) correct++;
+        if (this.userAnswers[i] === this.randomTests[i].correctIndex) {
+          correct++;
+        }
       }
 
-      const total = this.randomTests.length;
-      const wrong = total - correct;
-      const percent = Math.round((correct / total) * 100);
+      const wrong = this.randomTests.length - correct;
+      const percent = Math.round((correct / this.randomTests.length) * 100);
 
       let grade = 2;
       if (percent >= 86) grade = 5;
       else if (percent >= 71) grade = 4;
       else if (percent >= 50) grade = 3;
 
-      const body = {
-        studentId: "demoStudent",
-        testId: this.id,
-        correct,
-        wrong,
-        total,
-        percent,
-        grade,
-        answers: this.userAnswers,
-      };
+      this.axios
+        .post("http://localhost:3000/api/result/save", {
+          studentId: localStorage.getItem("demoStudentId"),
+          testId: this.id,
+          attemptId: this.attemptId,
+          correct,
+          wrong,
+          total: this.randomTests.length,
+          percent,
+          grade,
+          answers: this.userAnswers,
+        })
+        .then((res) => {
+          const resultGo = res.data.data._id;
+          this.$router.push("/result/" + resultGo);
+          console.log(resultGo);
+        })
+        .catch((err) => {
+          console.log(err);
+        });
     },
   },
 
@@ -223,16 +234,6 @@ export default {
         this.test.title = t.title;
         this.test.desc = t.desc;
         this.test.start = t.start;
-      })
-      .catch((err) => console.log(err));
-
-    const attemptId = this.$route.params.id;
-
-    this.axios
-      .get("http://localhost:3000/api/result/" + attemptId)
-      .then((res) => {
-        this.result = res.data.data;
-        this.questions = this.result.questions;
       })
       .catch((err) => console.log(err));
   },
