@@ -240,7 +240,7 @@ export default {
     async loadAllResults() {
       try {
         const res = await this.axios.get(
-          "http://10.1.100.230:3000/api/test/" + this.$route.params.id + "/results"
+          "/api/test/" + this.$route.params.id + "/results"
         );
 
         if (!res.data || !res.data.data) {
@@ -280,7 +280,7 @@ export default {
       let studentId = localStorage.getItem("token");
 
       this.axios
-        .post("http://10.1.100.230:3000/api/attempt/start", {
+        .post("/api/attempt/start", {
           studentId,
           testId: this.testRealId,
         })
@@ -337,7 +337,7 @@ export default {
       fd.append("randomCount", this.randomCount);
 
       this.axios
-        .post("http://10.1.100.230:3000/api/testOne/upload", fd)
+        .post("/api/testOne/upload", fd)
         .then((res) => {
           console.log(res.data);
           alert("Testlar muvaffaqiyatli yuklandi!");
@@ -349,7 +349,7 @@ export default {
       if (!confirm("Test va barcha ma’lumotlar o‘chirilsinmi?")) return;
 
       this.axios
-        .delete("http://10.1.100.230:3000/api/test/delete/full/" + this.id)
+        .delete("/api/test/delete/full/" + this.id)
         .then(() => {
           alert("Test va barcha ma’lumotlar o‘chirildi!");
           this.$router.push("/");
@@ -406,7 +406,7 @@ export default {
       else if (percent >= 70) grade = 3;
 
       this.axios
-        .post("http://10.1.100.230:3000/api/result/save", {
+        .post("/api/result/save", {
           studentId: localStorage.getItem("token"),
           testId: this.testRealId,
           attemptId: this.attemptId,
@@ -433,7 +433,7 @@ export default {
     downloadWord() {
       const testId = this.$route.params.id;
 
-      window.open(`http://10.1.100.230:3000/api/test/${testId}/results/word`);
+      window.open(`/api/test/${testId}/results/word`);
     },
     autoFinishExam(reason) {
       if (this.role !== "student") return;
@@ -504,7 +504,7 @@ export default {
   created() {
     if (this.role === "student") {
       this.axios
-        .get("http://10.1.100.230:3000/api/test/byCode/" + this.id)
+        .get("/api/test/byCode/" + this.id)
         .then((res) => {
           const t = res.data.data;
           this.testRealId = t._id;
@@ -522,7 +522,7 @@ export default {
       this.showAdminPanel = true;
 
       this.axios
-        .get("http://10.1.100.230:3000/api/test/byId/" + this.id)
+        .get("/api/test/byId/" + this.id)
         .then((res) => {
           const t = res.data.data;
           this.testRealId = t._id;

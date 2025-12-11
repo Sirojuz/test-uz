@@ -50,7 +50,7 @@ export default {
       this.name = "Admin";
     } else if (this.role === "student") {
       this.axios
-        .get("http://10.1.100.230:3000/api/user/" + this.token)
+        .get("/api/user/" + this.token)
         .then((res) => {
           this.name = res.data.result.name;
         });

@@ -63,7 +63,7 @@ export default {
     async loadResult() {
       try {
         const res = await this.axios.get(
-          "http://10.1.100.230:3000/api/result/" + this.attemptId
+          "/api/result/" + this.attemptId
         );
 
         const result = res.data.data;
@@ -90,7 +90,7 @@ export default {
 
       try {
         const res = await this.axios.get(
-          "http://10.1.100.230:3000/api/attempt/" + this.attemptId
+          "/api/attempt/" + this.attemptId
         );
         this.questions = res.data.data.questions;
       } catch (err) {

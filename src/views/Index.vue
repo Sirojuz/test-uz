@@ -171,7 +171,7 @@ export default {
         duration: this.duration,
       };
       this.axios
-        .post("http://10.1.100.230:3000/api/test/create", data)
+        .post("/api/test/create", data)
         .then((res) => {
           console.log(res);
           window.location.reload();
@@ -183,7 +183,7 @@ export default {
     testCod() {
       if (this.testCode) {
         this.axios
-          .get(`http://10.1.100.230:3000/api/test/byCode/` + this.testCode)
+          .get(`/api/test/byCode/` + this.testCode)
           .then((res) => {
             const testCode = res.data.data.testCode;
             this.$router.push(`/test/${testCode}`);
@@ -195,7 +195,7 @@ export default {
     },
   },
   created() {
-    this.axios.get("http://10.1.100.230:3000/api/test/all").then((res) => {
+    this.axios.get("/api/test/all").then((res) => {
       let result = res.data.data;
       this.getTest = result;
     });

@@ -98,7 +98,7 @@ export default {
   methods: {
     async getAllAdmins() {
       try {
-        const res = await this.axios.get("http://10.1.100.230:3000/api/admin/all");
+        const res = await this.axios.get("/api/admin/all");
         this.admins = res.data.result;
       } catch (err) {
         console.log("GetAll error:", err);
@@ -108,7 +108,7 @@ export default {
     async register() {
       try {
         const res = await this.axios.post(
-          "http://10.1.100.230:3000/api/admin/register",
+          "/api/admin/register",
           this.form
         );
 
@@ -128,7 +128,7 @@ export default {
       if (!confirm("Adminni o‘chirishni tasdiqlaysizmi?")) return;
 
       try {
-        await this.axios.delete("http://10.1.100.230:3000/api/admin/delete/" + id);
+        await this.axios.delete("/api/admin/delete/" + id);
 
         alert("Admin o‘chirildi!");
         this.getAllAdmins();
@@ -142,7 +142,7 @@ export default {
         return;
 
       this.axios
-        .delete("http://10.1.100.230:3000/api/user/delete/all", {
+        .delete("/api/user/delete/all", {
           data: { role: localStorage.getItem("role") },
         })
         .then((res) => {

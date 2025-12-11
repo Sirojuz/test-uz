@@ -86,7 +86,7 @@ export default {
 
       // Oddiy admin login
       this.axios
-        .post("http://10.1.100.230:3000/api/admin/login", this.admin)
+        .post("/api/admin/login", this.admin)
         .then((res) => {
           if (!res.data.success) {
             alert(res.data.message);
@@ -115,7 +115,7 @@ export default {
         return;
       }
       this.axios
-        .post("http://10.1.100.230:3000/api/user/register", this.data)
+        .post("/api/user/register", this.data)
         .then((res) => {
           localStorage.setItem("token", res.data.result._id);
           localStorage.setItem("role", "student");
