@@ -6,27 +6,20 @@
           Termiz davlat muhandistlik va agrotexnologiyalar universiteti
         </h1>
         <div class="d-none" :class="{ active: !activeTeacher }">
-          <h2 class="text">Ro'yxatdan o'tish</h2>
+          <h2 class="text">Kirish</h2>
           <div class="form d-flex flex-column align-items-center m-5 gap-3">
             <input
-              class="form_in number_end"
-              type="text"
-              placeholder="Ism Familyangizni kiriting..."
-              v-model="data.name" />
-            <input
               class="form_in"
               type="text"
-              placeholder="Fakultetingizni kiriting..."
-              v-model="data.faculty" />
+              placeholder="Loginingizni kiriting..."
+              v-model="data.login" />
             <input
               class="form_in"
-              type="text"
-              placeholder="Gurux raqamingizni kiriting..."
-              v-model="data.groupNumber" />
+              type="password"
+              placeholder="Parolingizni kiriting..."
+              v-model="data.password" />
             <a style="cursor: pointer" @click="activeTech">Ustozlar uchun</a>
-            <button class="btn-form" @click="register">
-              Ro'yxatdan o'tish
-            </button>
+            <button class="btn-form" @click="register">Kirish</button>
           </div>
         </div>
         <div class="d-none" :class="{ active: activeTeacher }">
@@ -59,9 +52,8 @@ export default {
     return {
       activeTeacher: false,
       data: {
-        name: null,
-        faculty: null,
-        groupNumber: null,
+        login: null,
+        password: null,
       },
       admin: { phone: null, password: null },
     };
@@ -98,11 +90,8 @@ export default {
             return;
           }
 
-          const admin = res.data.data; // backend "data" qaytaradi
-
-          localStorage.setItem("token", admin.id);
-          localStorage.setItem("role", admin.role);
-
+          const token = res.data.token;
+          localStorage.setItem("token", token);
           this.$router.push({ name: "home" });
         })
         .catch((err) => {
@@ -111,20 +100,14 @@ export default {
         });
     },
     register() {
-      if (
-        this.data.name == null ||
-        this.data.faculty == null ||
-        this.data.groupNumber == null
-      ) {
+      if (this.data.login == null || this.data.password == null) {
         alert("Iltimos barcha maydonlarni to'ldiring!");
         return;
       }
       this.axios
-        .post("/api/user/register", this.data)
+        .post("/v1/auth/login", this.data)
         .then((res) => {
-          localStorage.setItem("token", res.data.result._id);
-          localStorage.setItem("role", "student");
-          this.$router.push({ name: "home" });
+          console.log(res.data);
         })
         .catch((err) => {
           console.log(err);

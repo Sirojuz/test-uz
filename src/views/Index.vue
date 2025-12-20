@@ -216,6 +216,23 @@ export default {
       let result = res.data.data;
       this.getTest = result;
     });
+    this.axios
+      .get("/api/admin/decode", {
+        headers: {
+          token: localStorage.getItem("token"),
+        },
+      })
+      .then((res) => {
+        console.log(res.data);
+        if (!res.data.success) {
+          localStorage.removeItem("token");
+          localStorage.removeItem("role");
+          this.$router.push({ name: "login" });
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   },
   computed: {
     reversedTests() {
