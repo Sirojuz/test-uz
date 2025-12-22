@@ -80,9 +80,11 @@
           :key="index"
           class="p-3 shadow-sm border rounded d-flex gap-3 justify-content-center align-items-center mb-2"
         >
-          <h4>Talaba: {{ r.studentId.name }}</h4>
-          <p><b>Fakultet:</b> {{ r.studentId.faculty }}</p>
-          <p><b>Guruh:</b> {{ r.studentId.groupNumber }}</p>
+          <p class="m-auto">
+            <b>Talaba:</b> {{ r.attemptId.studentInfo.fullName }}
+          </p>
+          <p><b>Fakultet:</b> {{ r.attemptId.studentInfo.faculty }}</p>
+          <p><b>Guruh:</b> {{ r.attemptId.studentInfo.group }}</p>
           <p><b>To‘g‘ri:</b> {{ r.correct }}</p>
           <p><b>Noto‘g‘ri:</b> {{ r.wrong }}</p>
           <p><b>Foiz:</b> {{ r.percent }}%</p>
@@ -280,7 +282,7 @@
 </template>
 
 <script>
-import { api, studentApi } from "@/services/axios";
+import { api } from "@/services/axios";
 export default {
   data() {
     return {
@@ -297,7 +299,6 @@ export default {
       test: {},
       randomTests: [],
       userAnswers: [],
-      randomCount: null,
       attemptId: null,
       resultGo: null,
       showAdminPanel: false,
@@ -316,6 +317,7 @@ export default {
       testRealId: null,
       answerError: "",
       testClosed: null,
+      student: JSON.parse(localStorage.getItem("student")),
     };
   },
 
@@ -408,13 +410,16 @@ export default {
     },
     startExam() {
       this.btnTest = true;
-
-      let studentId = localStorage.getItem("token");
-
+      let studentCode = this.student.student_id_number;
       api
         .post("/api/attempt/start", {
-          studentId,
+          studentCode,
           testId: this.testRealId,
+          studentInfo: {
+            fullName: this.student.full_name,
+            group: this.student.group.name,
+            faculty: this.student.faculty.name,
+          },
         })
         .then((res) => {
           if (res.data.reason === "closed") {
@@ -542,7 +547,12 @@ export default {
 
       api
         .post("/api/result/save", {
-          studentId: localStorage.getItem("token"),
+          studentCode: this.student.student_id_number,
+          studentInfo: {
+            fullName: this.student.full_name,
+            faculty: this.student.faculty.name,
+            group: this.student.group.name,
+          },
           testId: this.testRealId,
           attemptId: this.attemptId,
           correct,
@@ -569,7 +579,7 @@ export default {
       const testId = this.$route.params.id;
 
       window.open(
-        `https://api.tdmau.uz/api/test/${testId}/results/word`,
+        `http://localhost:3100/api/test/${testId}/results/word`,
         "_blank"
       );
     },
@@ -640,8 +650,34 @@ export default {
   },
 
   created() {
-    this.role = localStorage.getItem("role");
-    this.admin = this.$store.state.admin;
+    const role = localStorage.getItem("role");
+    if (role !== "student") {
+      api
+        .get("/api/admin/decode", {
+          headers: {
+            token: localStorage.getItem("token"),
+          },
+        })
+        .then((res) => {
+          let result = res.data;
+          if (result.success) {
+            api
+              .get("/api/admin/" + result.decodedToken.adminId)
+              .then((response) => {
+                this.admin = response.data.result;
+                console.log(this.admin.role);
+              })
+              .catch((error) => {
+                console.log(error);
+              });
+          }
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+
+      this.loadAllResults();
+    }
     const url =
       this.role === "student"
         ? `/api/test/byCode/${this.id}`
@@ -650,21 +686,24 @@ export default {
     api.get(url).then((res) => {
       this.test = res.data.data;
       this.testRealId = this.test._id;
-
-      if (this.isJunTeaAd) {
-        this.loadAllResults();
-      }
+      console.log(this.test);
     });
   },
   computed: {
     isAdmin() {
-      return this.admin.role === "admin";
+      if (this.admin) {
+        return this.admin.role === "admin";
+      }
     },
     isTeaAd() {
-      return ["admin", "teacher"].includes(this.admin.role);
+      if (this.admin) {
+        return ["admin", "teacher"].includes(this.admin.role);
+      }
     },
     isJunTeaAd() {
-      return ["admin", "teacher", "junior-teacher"].includes(this.admin.role);
+      if (this.admin) {
+        return ["admin", "teacher", "junior-teacher"].includes(this.admin.role);
+      }
     },
   },
 };
@@ -689,5 +728,9 @@ input[type="file"] {
 p,
 h4 {
   margin: 0 !important;
+}
+p {
+  display: flex;
+  align-items: center;
 }
 </style>

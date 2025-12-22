@@ -15,13 +15,15 @@
         data-bs-target="#navbarNavAltMarkup"
         aria-controls="navbarNavAltMarkup"
         aria-expanded="false"
-        aria-label="Toggle navigation">
+        aria-label="Toggle navigation"
+      >
         <span class="navbar-toggler-icon"></span>
       </button>
       <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
         <div class="navbar-nav"></div>
         <div class="d-flex ms-auto align-items-center gap-3">
-          <h4 class="m-auto">{{ this.name }}</h4>
+          <p v-if="adName" class="m-auto">{{ adName }}</p>
+          <p v-else class="m-auto">{{ student.full_name }}</p>
           <button @click="exit()" class="btn btn-danger">Chiqish</button>
         </div>
       </div>
@@ -30,12 +32,14 @@
 </template>
 
 <script>
+import { api } from "@/services/axios";
 export default {
   data() {
     return {
-      name: null,
+      student: JSON.parse(localStorage.getItem("student")),
       token: localStorage.getItem("token"),
-      role: localStorage.getItem("role"),
+      role: null,
+      adName: null,
     };
   },
   methods: {
@@ -46,13 +50,32 @@ export default {
     },
   },
   created() {
-    if (this.role === "admin") {
-      this.name = "Admin";
-    } else if (this.role === "student") {
-      this.axios
-        .get("/api/user/" + this.token)
+    const role = localStorage.getItem("role");
+    if (role !== "student") {
+      api
+        .get("/api/admin/decode", {
+          headers: {
+            token: localStorage.getItem("token"),
+          },
+        })
         .then((res) => {
-          this.name = res.data.result.name;
+          let result = res.data;
+          if (result.success) {
+            api
+              .get("/api/admin/" + result.decodedToken.adminId)
+              .then((response) => {
+                this.adName = response.data.result.name;
+              })
+              .catch((error) => {
+                console.log(error);
+              });
+          } else {
+            localStorage.clear();
+            this.$router.push({ name: "login" });
+          }
+        })
+        .catch((err) => {
+          console.log(err);
         });
     }
   },

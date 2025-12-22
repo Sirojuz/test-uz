@@ -90,16 +90,17 @@
             class="text-decoration-none text-dark"
             :to="`/test/${item._id}`"
           >
-            <div class="card">
-              <div class="card-body">
+            <div class="card" style="height: 155px">
+              <div class="card-body row align-items-center">
                 <figure>
                   <blockquote class="blockquote">
                     <p style="font-weight: bold">
                       {{ item.title }}
                     </p>
                   </blockquote>
-                  <figcaption class="blockquote-footer">
-                    {{ item.desc }}
+                  <figcaption class="blockquote-footer clamp_desc">
+                    <span><b>Ustoz:</b>{{ admin.name }}</span>
+                    <p><b>Gurux:</b>{{ item.desc }}</p> 
                   </figcaption>
                 </figure>
               </div>
@@ -172,6 +173,7 @@ export default {
   },
   data() {
     return {
+      admin: null,
       testCode: null,
       formActive: false,
       btnSuccess: true,
@@ -182,6 +184,7 @@ export default {
       getTest: [],
       getRole: null,
       testCodeError: false,
+      token: localStorage.getItem("token"),
     };
   },
   methods: {
@@ -230,33 +233,51 @@ export default {
       let result = res.data.data;
       this.getTest = result;
     });
-    api
-      .get("/api/admin/decode", {
-        headers: {
-          token: localStorage.getItem("token"),
-        },
-      })
-      .then((res) => {
-        let result = res.data;
-        if (result.success) {
-          api
-            .get("/api/admin/" + result.decodedToken.adminId)
-            .then((response) => {
-              this.getRole = response.data.result.role;
-              this.$store.state.admin = response.data.result;
-              console.log(this.getRole);
-            })
-            .catch((error) => {
-              console.log(error);
-            });
-        } else {
-          localStorage.clear();
-          this.$router.push({ name: "login" });
-        }
-      })
-      .catch((err) => {
-        console.log(err);
-      });
+
+    const role = localStorage.getItem("role");
+    if (role !== "student") {
+      api
+        .get("/api/admin/decode", {
+          headers: {
+            token: localStorage.getItem("token"),
+          },
+        })
+        .then((res) => {
+          let result = res.data;
+          if (result.success) {
+            api
+              .get("/api/admin/" + result.decodedToken.adminId)
+              .then((response) => {
+                this.getRole = response.data.result.role;
+                this.admin = response.data.result;
+              })
+              .catch((error) => {
+                console.log(error);
+              });
+          } else {
+            localStorage.clear();
+            this.$router.push({ name: "login" });
+          }
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    } else {
+      api
+        .get("/api/student/me", {
+          headers: {
+            Authorization: `Bearer ${this.token}`,
+            Accept: "application/json",
+          },
+        })
+        .then((res) => {
+          this.$store.state.student = res.data.data.data;
+          localStorage.setItem("student", JSON.stringify(res.data.data.data));
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    }
   },
   computed: {
     reversedTests() {
@@ -292,5 +313,11 @@ figcaption {
 }
 figure {
   margin: 0;
+}
+.clamp_desc {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 </style>

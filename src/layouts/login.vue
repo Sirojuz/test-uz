@@ -43,8 +43,8 @@
               v-model="admin.password"
             />
             <a style="cursor: pointer" @click="activeTech">Talabalar uchun</a>
+            <button type="button" class="btn-form" @click="login">Kirish</button>
           </div>
-          <button type="button" class="btn-form" @click="login">Kirish</button>
         </div>
       </div>
     </div>
@@ -110,13 +110,22 @@ export default {
         alert("Iltimos barcha maydonlarni to'ldiring!");
         return;
       }
-      studentApi
-        .post("/v1/auth/login", this.data)
-        .then((res) => {
-          console.log(res.data);
+      api
+        .post("/api/user/student/login", {
+          login: this.data.login,
+          password: this.data.password,
         })
-        .catch((err) => {
-          console.log(err);
+        .then((res) => {
+          const student = res.data;
+
+          localStorage.setItem("token", student.data.token);
+          localStorage.setItem("role", "student");
+
+          this.$router.push({ name: "home" });
+        })
+        .catch(() => {
+          alert("Login xato");
+          console.log(this.data);
         });
     },
   },
