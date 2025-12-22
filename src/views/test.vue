@@ -655,6 +655,15 @@ export default {
           console.log(err);
         });
 
+      api
+        .get("/api/testOne/" + this.id)
+        .then((res) => {
+          this.testOne = res.data.data;
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+        
       this.loadAllResults();
     }
     const url =
@@ -666,14 +675,6 @@ export default {
       this.test = res.data.data;
       this.testRealId = this.test._id;
     });
-    api
-      .get("/api/testOne/" + this.id)
-      .then((res) => {
-        this.testOne = res.data.data;
-      })
-      .catch((err) => {
-        console.log(err);
-      });
   },
   computed: {
     isAdmin() {
