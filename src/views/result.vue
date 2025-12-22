@@ -17,8 +17,7 @@
       <div
         v-for="(q, qIndex) in questions"
         :key="qIndex"
-        class="question-block mb-4 p-3 shadow-sm bg-white rounded"
-      >
+        class="question-block mb-4 p-3 shadow-sm bg-white rounded">
         <h4>{{ qIndex + 1 }}. {{ q.question }}</h4>
 
         <div v-for="(opt, optIndex) in q.options" :key="optIndex">
@@ -49,8 +48,7 @@ export default {
       total: 0,
       percent: 0,
       grade: 0,
-
-      attemptId: localStorage.getItem("attemptId"),
+      attemptId: this.$route.params.id,
     };
   },
 

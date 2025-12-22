@@ -411,8 +411,9 @@ export default {
           }
           // 1) Agar testni oldin tugatgan bo‘lsa:
           if (res.data.already === true) {
-            alert("Siz bu testni allaqachon yakunlagansiz!");
             this.$router.push("/result/" + res.data.attemptId);
+            alert("Siz bu testni allaqachon yakunlagansiz!");
+
             return;
           }
 
@@ -663,7 +664,7 @@ export default {
         .catch((err) => {
           console.log(err);
         });
-        
+
       this.loadAllResults();
     }
     const url =
