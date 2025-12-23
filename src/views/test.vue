@@ -559,7 +559,7 @@ export default {
       const testId = this.$route.params.id;
 
       window.open(
-        `http://localhost:3100/api/test/${testId}/results/word`,
+        `https://api.tdmau.uz/api/test/${testId}/results/word`,
         "_blank"
       );
     },

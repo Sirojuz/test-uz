@@ -90,7 +90,7 @@
                     </p>
                   </blockquote>
                   <figcaption class="blockquote-footer clamp_desc">
-                    <span><b>Ustoz:</b>{{ admin.name }}</span>
+                    <span><b>Ustoz:</b>{{ item.creator }}</span>
                     <p><b>Gurux:</b>{{ item.desc }}</p>
                   </figcaption>
                 </figure>
@@ -190,6 +190,7 @@ export default {
         title: this.title,
         desc: this.desc,
         duration: this.duration,
+        creator: this.admin.name,
       };
       api
         .post("/api/test/create", data)
