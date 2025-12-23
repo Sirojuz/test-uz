@@ -48,6 +48,15 @@
     </div>
   </div>
 </template>
+<script setup>
+import { useHead } from "@vueuse/head";
+
+useHead({
+  title: "Kirish – Examin TDMAU",
+  meta: [{ name: "robots", content: "noindex, nofollow" }],
+});
+</script>
+
 <script>
 import { api, studentApi } from "@/services/axios";
 

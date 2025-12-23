@@ -101,7 +101,7 @@
       </div>
     </div>
     <div
-      v-else
+      v-else-if="student"
       class="main_test d-flex justify-content-center align-items-center"
       style="min-height: 100vh; background: #f5f7fa">
       <div
@@ -147,8 +147,39 @@
         </div>
       </div>
     </div>
+    <div v-else class="d-flex justify-content-center align-items-center mt-5">
+      <div>
+        <h3 class="text-center m-auto">Loading...</h3>
+      </div>
+      <div class="spinner-border text" role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+    </div>
   </div>
 </template>
+
+<script setup>
+import { useHead } from "@vueuse/head";
+
+useHead({
+  title:
+    "Examin TDMAU – Termiz davlat muhandislik va agrotexnologiyalar universiteti test tizimi",
+  meta: [
+    {
+      name: "description",
+      content:
+        "Examin TDMAU – Termiz davlat muhandislik va agrotexnologiyalar universiteti uchun onlayn test va imtihon platformasi.",
+    },
+    {
+      name: "keywords",
+      content:
+        "Termiz davlat muhandislik va agrotexnologiyalar universiteti, TDMAU, TERDMAU, Examin TDMAU, tdmau test,tdmau onlayn test,tdmau imtihon platformasi,tdmau test tizimi,",
+    },
+    { name: "robots", content: "index, follow" },
+  ],
+  link: [{ rel: "canonical", href: "https://examin.tdmau.uz/" }],
+});
+</script>
 
 <script>
 import testCard from "@/components/test-card.vue";
@@ -172,6 +203,7 @@ export default {
       getRole: null,
       testCodeError: false,
       token: localStorage.getItem("token"),
+      student: localStorage.getItem("role"),
     };
   },
   methods: {
