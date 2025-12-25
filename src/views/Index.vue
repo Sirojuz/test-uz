@@ -283,8 +283,8 @@ export default {
           console.log(err);
         });
     } else {
-      studentApi
-        .get("/v1/account/me", {
+      api
+        .get("/api/student/me", {
           headers: {
             Authorization: `Bearer ${this.token}`,
             Accept: "application/json",
