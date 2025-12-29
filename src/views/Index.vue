@@ -103,7 +103,7 @@
     <div
       v-else-if="student"
       class="main_test d-flex justify-content-center align-items-center"
-      style="min-height: 100vh; background: #f5f7fa">
+      style="min-height: 80vh; background: #f5f7fa">
       <div
         class="card shadow-lg p-4"
         style="max-width: 550px; width: 100%; border-radius: 12px">

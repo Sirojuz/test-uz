@@ -77,7 +77,7 @@
           v-for="(r, index) in allResults"
           :key="index"
           class="shadow-sm border rounded d-flex gap-3 justify-content-center align-items-center mb-2">
-          <table class="table text-center">
+          <table class="table">
             <thead>
               <tr>
                 <th scope="col">Talaba</th>
@@ -88,8 +88,8 @@
                 <th scope="col">Foiz</th>
                 <th scope="col">Baho</th>
                 <th scope="col">Yakunlagan</th>
-                <th scope="col">Raqami</th>
-                <th scope="col">Rasmi</th>
+                <th v-if="admin.phone === 997445218" scope="col">Raqami</th>
+                <th v-if="admin.phone === 997445218" scope="col">Rasmi</th>
                 <th scope="col">Amallar</th>
               </tr>
             </thead>
@@ -103,8 +103,10 @@
                 <td>{{ r.percent }}%</td>
                 <td>{{ r.grade }}</td>
                 <td>{{ formatDate(r.createdAt) }}</td>
-                <th>{{ r.attemptId.studentInfo.studentNumber }}</th>
-                <td>
+                <th v-if="admin.phone === 997445218">
+                  {{ r.attemptId.studentInfo.studentNumber }}
+                </th>
+                <td v-if="admin.phone === 997445218">
                   <img
                     :src="r.attemptId.studentInfo.studentImage"
                     alt="Talaba rasmi"
@@ -630,11 +632,13 @@ export default {
       });
     },
     resetAttempt(result) {
+      if (!confirm("Talabaga testni qayta topshirish imkoni berilsinmi?"))
+        return;
       const resultId = result._id;
       const attemptId = result.attemptId._id;
 
       api
-        .put(`/api/attempt/edit/${attemptId}`)
+        .delete(`/api/attempt/delete/${attemptId}`)
         .then((res) => {
           console.log("Attempt reset:", res.data);
         })
