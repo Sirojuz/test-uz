@@ -76,84 +76,59 @@
         <div
           v-for="(r, index) in allResults"
           :key="index"
-          class="p-3 shadow-sm border rounded d-flex gap-3 justify-content-center align-items-center mb-2">
-          <p class="m-auto">
-            <b>Talaba:</b> {{ r.attemptId.studentInfo.fullName }}
-          </p>
-          <p><b>Fakultet:</b> {{ r.attemptId.studentInfo.faculty }}</p>
-          <p><b>Guruh:</b> {{ r.attemptId.studentInfo.group }}</p>
-          <p><b>To‘g‘ri:</b> {{ r.correct }}</p>
-          <p><b>Noto‘g‘ri:</b> {{ r.wrong }}</p>
-          <p><b>Foiz:</b> {{ r.percent }}%</p>
-          <p><b>Baho:</b> {{ r.grade }}</p>
-          <p><b>Test yakunlangan vaqt:</b> {{ formatDate(r.createdAt) }}</p>
-          <button
-            v-if="isAdmin"
-            class="btn btn-sm btn-warning"
-            @click="openEditModal(r)">
-            Tahrirlash
-          </button>
-
-          <div class="modal fade" id="editResultModal" tabindex="-1">
-            <div class="modal-dialog">
-              <div class="modal-content">
-                <div class="modal-header">
-                  <h5 class="modal-title">Natijani tahrirlash</h5>
+          class="shadow-sm border rounded d-flex gap-3 justify-content-center align-items-center mb-2">
+          <table class="table text-center">
+            <thead>
+              <tr>
+                <th scope="col">Talaba</th>
+                <th scope="col">Fakultet</th>
+                <th scope="col">Guruh</th>
+                <th scope="col">To‘g‘ri</th>
+                <th scope="col">Noto‘g‘ri</th>
+                <th scope="col">Foiz</th>
+                <th scope="col">Baho</th>
+                <th scope="col">Yakunlagan</th>
+                <th scope="col">Raqami</th>
+                <th scope="col">Rasmi</th>
+                <th scope="col">Amallar</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="">
+                <th>{{ r.attemptId.studentInfo.fullName }}</th>
+                <td>{{ r.attemptId.studentInfo.faculty }}</td>
+                <td>{{ r.attemptId.studentInfo.group }}</td>
+                <td>{{ r.correct }}</td>
+                <th>{{ r.wrong }}</th>
+                <td>{{ r.percent }}%</td>
+                <td>{{ r.grade }}</td>
+                <td>{{ formatDate(r.createdAt) }}</td>
+                <th>{{ r.attemptId.studentInfo.studentNumber }}</th>
+                <td>
+                  <img
+                    :src="r.attemptId.studentInfo.studentImage"
+                    alt="Talaba rasmi"
+                    class="img-fluid d-block rounded"
+                    style="max-width: 50px; max-height: 50px" />
+                </td>
+                <td>
                   <button
-                    type="button"
-                    class="btn-close"
-                    data-bs-dismiss="modal"></button>
-                </div>
-
-                <div class="modal-body">
-                  <div class="mb-2">
-                    <label>To‘g‘ri</label>
-                    <input
-                      type="number"
-                      v-model="editResult.correct"
-                      class="form-control" />
-                  </div>
-
-                  <div class="mb-2">
-                    <label>Noto‘g‘ri</label>
-                    <input
-                      type="number"
-                      v-model="editResult.wrong"
-                      class="form-control" />
-                  </div>
-
-                  <div class="mb-2">
-                    <label>Foiz</label>
-                    <input
-                      type="number"
-                      v-model="editResult.percent"
-                      class="form-control" />
-                  </div>
-
-                  <div class="mb-2">
-                    <label>Baho</label>
-                    <select v-model="editResult.grade" va class="form-select">
-                      <option :value="2">2</option>
-                      <option :value="3">3</option>
-                      <option :value="4">4</option>
-                      <option :value="5">5</option>
-                    </select>
-                  </div>
-                </div>
-
-                <div class="modal-footer">
-                  <button class="btn btn-secondary" data-bs-dismiss="modal">
-                    Bekor
+                    v-if="isAdmin"
+                    class="btn btn-sm btn-warning me-2"
+                    @click="openEditModal(r)">
+                    Tahrirlash
                   </button>
-                  <button class="btn btn-success" @click="updateResult">
-                    Saqlash
+                  <button
+                    v-if="isAdmin"
+                    class="btn btn-sm btn-warning"
+                    @click="resetAttempt(r)">
+                    Qayta imkon
                   </button>
-                </div>
-              </div>
-            </div>
-          </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
         </div>
-        <!-- Edit Result Modal -->
       </div>
     </div>
     <div>
@@ -167,27 +142,56 @@
             style="right: 10px">
             Qolgan vaqt: <b>{{ timeLeft }}</b>
           </div>
+          <div v-if="questions && questions.length">
+            <div
+              v-for="(question, qIndex) in questions"
+              :key="qIndex"
+              class="mb-5 p-4 border rounded shadow-sm">
+              <!-- SAVOL -->
+              <div class="mb-3 d-flex align-items-center">
+                <h5 class="fw-bold">{{ qIndex + 1 }}:</h5>
+                <h5
+                  v-for="(block, bIndex) in question.questionBlocks"
+                  :key="bIndex">
+                  <p v-if="block.type === 'text'">
+                    {{ block.value }}
+                  </p>
 
-          <div
-            class="d-flex flex-column mt-4"
-            v-for="(item, qIndex) in randomTests"
-            :key="item._id">
-            <div class="question d-flex flex-column mb-4 align-items-start">
-              <h3>{{ qIndex + 1 }}. {{ item.question }}</h3>
-
-              <div class="answers d-flex gap-4">
+                  <img
+                    v-else-if="block.type === 'image'"
+                    :src="block.value"
+                    class="img-fluid my-2 rounded"
+                    style="max-height: 300px" />
+                </h5>
+              </div>
+              <div>
                 <div
-                  v-for="(option, optIndex) in item.options"
+                  v-for="(option, optIndex) in question.options"
                   :key="optIndex"
-                  class="form-check">
-                  <label class="form-check-label">
-                    <input
-                      class="form-check-input"
-                      type="radio"
-                      :name="'question_' + qIndex"
-                      :value="optIndex"
-                      v-model="userAnswers[qIndex]" />
-                    {{ option }}
+                  class="form-check px-2 border rounded shadow-sm d-flex align-items-center">
+                  <input
+                    class="form-check-input m-1"
+                    type="radio"
+                    :id="'q_' + qIndex + '_' + optIndex"
+                    :value="optIndex"
+                    v-model="answers[qIndex]" />
+
+                  <label
+                    class="form-check-label ms-2 w-100 text-start"
+                    :for="'q_' + qIndex + '_' + optIndex">
+                    <template
+                      v-for="(block, bIndex) in option.blocks"
+                      :key="bIndex">
+                      <span v-if="block.type === 'text'">
+                        {{ block.value }}
+                      </span>
+
+                      <img
+                        v-else-if="block.type === 'image'"
+                        :src="block.value"
+                        style="max-width: 100px"
+                        class="img-fluid d-block rounded" />
+                    </template>
                   </label>
                 </div>
               </div>
@@ -280,12 +284,9 @@ export default {
       randomCount: null,
       selectedFile: null,
       test: {},
-      randomTests: [],
-      userAnswers: [],
       attemptId: null,
       resultGo: null,
       showAdminPanel: false,
-      tests: [],
       role: localStorage.getItem("role"),
       admin: null,
       allResults: [],
@@ -301,7 +302,8 @@ export default {
       answerError: "",
       testClosed: null,
       student: JSON.parse(localStorage.getItem("student")),
-      testOne: [],
+      questions: [],
+      answers: null,
     };
   },
 
@@ -403,6 +405,8 @@ export default {
             fullName: this.student.full_name,
             group: this.student.group.name,
             faculty: this.student.faculty.name,
+            studentNumber: this.student.phone,
+            studentImage: this.student.image,
           },
         })
         .then((res) => {
@@ -423,11 +427,11 @@ export default {
             return;
           }
 
-          this.randomTests = res.data.questions;
+          this.questions = res.data.questions;
           this.attemptId = res.data.attemptId;
           this.finishTime = new Date(res.data.finishTime);
 
-          this.userAnswers = new Array(this.randomTests.length).fill(null);
+          this.answers = new Array(this.questions.length).fill(null);
 
           // 3) Faqat talaba boshlaganda kuzatuvlarni yoq
           if (this.role === "student") {
@@ -482,17 +486,21 @@ export default {
         .catch((err) => console.log(err));
     },
     finishExam(force = false) {
+      // answers har doim massiv bo‘lsin
+      if (!Array.isArray(this.answers)) {
+        this.answers = [];
+      }
+
+      // faqat manual tugatishda tekshiramiz
       if (force !== "auto") {
-        const notAnswered = this.userAnswers.findIndex((a) => a === null);
+        const notAnswered = this.answers.findIndex((a) => a === null);
         if (notAnswered !== -1) {
           this.answerError = `${notAnswered + 1}-savolga javob belgilanmagan!`;
           return;
         }
       }
 
-      if (this.testFinished || this.isSaving) {
-        return;
-      }
+      if (this.testFinished || this.isSaving) return;
 
       this.testFinished = true;
       this.isSaving = true;
@@ -501,29 +509,25 @@ export default {
         clearInterval(this.timerId);
         this.timerId = null;
       }
-      if (
-        !this.randomTests ||
-        !Array.isArray(this.randomTests) ||
-        this.randomTests.length === 0
-      ) {
-        console.error("Test savollari yuklanmagan, yakunlab bo‘lmaydi!");
+
+      // ❗ ASOSIY MANBA — questions
+      if (!Array.isArray(this.questions) || this.questions.length === 0) {
+        console.error("Test savollari yuklanmagan");
+        this.isSaving = false;
         return;
       }
 
-      if (!this.attemptId) {
-        console.error("Attempt ID topilmadi, testni yakunlab bo‘lmaydi!");
-        return;
-      }
       let correct = 0;
 
-      for (let i = 0; i < this.randomTests.length; i++) {
-        if (this.userAnswers[i] === this.randomTests[i].correctIndex) {
+      this.questions.forEach((q, index) => {
+        if (this.answers[index] === q.correctIndex) {
           correct++;
         }
-      }
+      });
 
-      const wrong = this.randomTests.length - correct;
-      const percent = Math.round((correct / this.randomTests.length) * 100);
+      const total = this.questions.length;
+      const wrong = total - correct;
+      const percent = Math.round((correct / total) * 100);
 
       let grade = 2;
       if (percent >= 90) grade = 5;
@@ -537,37 +541,28 @@ export default {
           attemptId: this.attemptId,
           correct,
           wrong,
-          total: this.randomTests.length,
+          total,
           percent,
           grade,
-          answers: this.userAnswers,
+          answers: this.answers,
         })
         .then((res) => {
-          this.resultGo = res.data.data._id;
-          localStorage.setItem("result", this.resultGo);
-          localStorage.setItem("attemptId", this.attemptId);
-          this.$router.push("/result/" + this.attemptId);
+          this.$router.push("/result/" + res.data.data.attemptId);
+          // console.log(res.data.data);
         })
         .catch((err) => {
-          console.log(err);
+          console.error("Natijani saqlashda xato:", err);
         })
         .finally(() => {
           this.isSaving = false;
         });
     },
-    downloadWord() {
-      const testId = this.$route.params.id;
-
-      window.open(
-        `https://api.tdmau.uz/api/test/${testId}/results/word`,
-        "_blank"
-      );
-    },
     autoFinishExam(reason) {
-      if (this.role !== "student") return;
       if (this.testFinished || this.isSaving) return;
 
       alert("Test yakunlandi!\nSabab: " + reason);
+
+      // majburan auto finish
       this.finishExam("auto");
     },
     enterFullScreen() {
@@ -614,7 +609,14 @@ export default {
         this.timeLeft = `${m}m : ${s}s`;
       }, 1000);
     },
+    downloadWord() {
+      const testId = this.$route.params.id;
 
+      window.open(
+        `https://api.tdmau.uz/api/test/${testId}/results/word`,
+        "_blank"
+      );
+    },
     formatDate(dateString) {
       const date = new Date(dateString);
       date.setHours(date.getHours());
@@ -626,6 +628,29 @@ export default {
         minute: "2-digit",
         second: "2-digit",
       });
+    },
+    resetAttempt(result) {
+      const resultId = result._id;
+      const attemptId = result.attemptId._id;
+
+      api
+        .put(`/api/attempt/edit/${attemptId}`)
+        .then((res) => {
+          console.log("Attempt reset:", res.data);
+        })
+        .catch((err) => {
+          console.error("Attempt reset error:", err);
+          return;
+        });
+      api
+        .delete(`/api/result/delete/${resultId}`)
+        .then((res) => {
+          alert("Talabaga testni qayta topshirish imkoni berildi.");
+          window.location.reload();
+        })
+        .catch((err) => {
+          console.error("Result delete error:", err);
+        });
     },
   },
 
@@ -640,12 +665,12 @@ export default {
         })
         .then((res) => {
           let result = res.data;
+
           if (result.success) {
             api
               .get("/api/admin/" + result.decodedToken.adminId)
               .then((response) => {
                 this.admin = response.data.result;
-                console.log(this.admin.role);
               })
               .catch((error) => {
                 console.log(error);

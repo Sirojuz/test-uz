@@ -12,18 +12,57 @@
       <p><strong>Baho:</strong> {{ grade }}</p>
     </div>
 
-    <!-- Questions & answers -->
     <div v-if="questions.length" class="questions-list">
       <div
         v-for="(q, qIndex) in questions"
         :key="qIndex"
         class="question-block mb-4 p-3 shadow-sm bg-white rounded">
-        <h4>{{ qIndex + 1 }}. {{ q.question }}</h4>
+        <!-- SAVOL SARLAVHASI -->
+        <h4 class="mb-3 d-flex align-items-center gap-2">
+          <!-- STATUS ICON -->
+          <span class="status-icon">
+            <span
+              v-if="answers[qIndex] === undefined || answers[qIndex] === null"
+              class="icon warning"
+              title="Javob belgilanmagan"
+              >❗</span
+            >
+          </span>
 
-        <div v-for="(opt, optIndex) in q.options" :key="optIndex">
-          <p :style="getStyle(qIndex, optIndex)">
-            {{ optIndex + 1 }}. {{ opt }}
-          </p>
+          <!-- SAVOL TEXT + RASM -->
+          <span>
+            {{ qIndex + 1 }}.
+            <span v-for="(b, i) in q.questionBlocks" :key="i">
+              <template v-if="b.type === 'text'">
+                {{ b.value }}
+              </template>
+              <template v-else-if="b.type === 'image'">
+                <img
+                  :src="b.value"
+                  class="img-fluid d-block my-2"
+                  style="max-width: 150px" />
+              </template>
+            </span>
+          </span>
+        </h4>
+        <div
+          v-for="(opt, optIndex) in q.options"
+          :key="optIndex"
+          class="px-2 rounded mb-2 option d-flex align-items-center gap-1 shadow-sm"
+          :class="getOptionClass(qIndex, optIndex)">
+          <strong>{{ optIndex + 1 }}.</strong>
+
+          <span v-for="(b, bi) in opt.blocks" :key="bi">
+            <template v-if="b.type === 'text'">
+              {{ b.value }}
+            </template>
+            <template v-else-if="b.type === 'image'">
+              <img
+                :src="b.value"
+                class="img-fluid d-block my-2"
+                style="max-width: 100px" />
+            </template>
+          </span>
         </div>
       </div>
     </div>
@@ -41,8 +80,8 @@ import { api, studentApi } from "@/services/axios";
 export default {
   data() {
     return {
-      questions: [], // attempt API
-      answers: [], // result API
+      questions: [],
+      answers: [],
       correctCount: 0,
       wrongCount: 0,
       total: 0,
@@ -64,6 +103,7 @@ export default {
         const res = await api.get("/api/result/" + this.attemptId);
 
         const result = res.data.data;
+        console.log(result);
 
         // Result ichidan keladigan ma’lumotlar
         this.answers = result.answers;
@@ -93,21 +133,20 @@ export default {
       }
     },
 
-    // 3. Variantlarni ranglash
-    getStyle(qIndex, optIndex) {
-      if (!this.questions.length || !this.answers.length) return "";
+    getOptionClass(qIndex, optIndex) {
+      const q = this.questions[qIndex];
+      const userAnswer = this.answers?.[qIndex];
 
-      const correctIndex = this.questions[qIndex].correctIndex;
-      const userAnswer = this.answers[qIndex];
+      if (userAnswer === undefined || userAnswer === null) return "";
 
-      // to'g'ri javob variant
-      if (optIndex === correctIndex) {
-        return "background:#4caf50;color:white;";
+      // foydalanuvchi tanlagan
+      if (optIndex === userAnswer) {
+        return optIndex === q.correctIndex ? "correct" : "wrong";
       }
 
-      // foydalanuvchi noto'g'ri belgilagan variant
-      if (optIndex === userAnswer && userAnswer !== correctIndex) {
-        return "background:#f44336;color:white;";
+      // to‘g‘ri javobni yashil qilib ko‘rsatamiz
+      if (optIndex === q.correctIndex) {
+        return "correct";
       }
 
       return "";
@@ -129,9 +168,39 @@ export default {
 .question-block {
   border-left: 4px solid #198754;
 }
+.option {
+  border-left: 6px solid #bdbdbd;
+}
 
 p {
   font-size: 16px;
   margin: 4px 0;
+}
+.status-icon {
+  font-size: 22px;
+}
+
+.icon {
+  font-weight: bold;
+}
+
+.icon.correct {
+  color: #2e7d32; /* yashil */
+}
+
+.icon.wrong {
+  color: #c62828; /* qizil */
+}
+
+.icon.warning {
+  color: #f9a825; /* sariq */
+}
+
+.option.correct {
+  border-left: 6px solid #2e7d32;
+}
+
+.option.wrong {
+  border-left: 6px solid #c62828;
 }
 </style>

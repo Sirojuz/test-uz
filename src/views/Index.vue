@@ -114,7 +114,6 @@
           <h5 class="text-muted">Test platformasi</h5>
         </div>
 
-        <!-- Test code input -->
         <div class="mb-3">
           <label for="testCode" class="form-label fw-semibold"
             >Test kodini kiriting</label
@@ -127,17 +126,14 @@
             v-model="testCode" />
         </div>
 
-        <!-- Error -->
         <p class="text-danger mb-2" v-if="testCodeError">TEST KODI XATO</p>
 
-        <!-- Button -->
         <div class="d-grid">
           <button class="btn btn-primary btn-lg" @click="testCod">
             Kirish
           </button>
         </div>
 
-        <!-- Alert info -->
         <div
           class="alert alert-warning mt-4 text-center"
           style="font-size: 15px">
@@ -178,6 +174,18 @@ useHead({
     { name: "robots", content: "index, follow" },
   ],
   link: [{ rel: "canonical", href: "https://examin.tdmau.uz/" }],
+  script: [
+    {
+      type: "application/ld+json",
+      children: JSON.stringify({
+        "@context": "https://schema.org",
+        "@type": "Organization",
+        name: "Examin TDMAU",
+        url: "https://examin.tdmau.uz",
+        logo: "https://examin.tdmau.uz/favicon.ico",
+      }),
+    },
+  ],
 });
 </script>
 
@@ -283,8 +291,8 @@ export default {
           console.log(err);
         });
     } else {
-      studentApi
-        .get("/v1/account/me", {
+      api
+        .get("/api/student/me", {
           headers: {
             Authorization: `Bearer ${this.token}`,
             Accept: "application/json",

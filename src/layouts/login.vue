@@ -106,8 +106,8 @@ export default {
         alert("Iltimos barcha maydonlarni to'ldiring!");
         return;
       }
-      studentApi
-        .post("/v1/auth/login", {
+      api
+        .post("/api/user/student/login", {
           login: this.data.login,
           password: this.data.password,
         })
