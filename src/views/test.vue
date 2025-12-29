@@ -130,6 +130,63 @@
               </tr>
             </tbody>
           </table>
+          <div class="modal fade" id="editResultModal" tabindex="-1">
+            <div class="modal-dialog">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title">Natijani tahrirlash</h5>
+                  <button
+                    type="button"
+                    class="btn-close"
+                    data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                  <div class="mb-2">
+                    <label>To‘g‘ri</label>
+                    <input
+                      type="number"
+                      v-model="editResult.correct"
+                      class="form-control" />
+                  </div>
+
+                  <div class="mb-2">
+                    <label>Noto‘g‘ri</label>
+                    <input
+                      type="number"
+                      v-model="editResult.wrong"
+                      class="form-control" />
+                  </div>
+
+                  <div class="mb-2">
+                    <label>Foiz</label>
+                    <input
+                      type="number"
+                      v-model="editResult.percent"
+                      class="form-control" />
+                  </div>
+
+                  <div class="mb-2">
+                    <label>Baho</label>
+                    <select v-model="editResult.grade" va class="form-select">
+                      <option :value="2">2</option>
+                      <option :value="3">3</option>
+                      <option :value="4">4</option>
+                      <option :value="5">5</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div class="modal-footer">
+                  <button class="btn btn-secondary" data-bs-dismiss="modal">
+                    Bekor
+                  </button>
+                  <button class="btn btn-success" @click="updateResult">
+                    Saqlash
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -480,7 +537,7 @@ export default {
       if (!confirm("Test va barcha ma’lumotlar o‘chirilsinmi?")) return;
 
       api
-        .delete("/api/test/delete/full/" + this.id)
+        .delete("/api/test/delete/" + this.id)
         .then(() => {
           alert("Test va barcha ma’lumotlar o‘chirildi!");
           this.$router.push("/");
@@ -634,6 +691,7 @@ export default {
     resetAttempt(result) {
       if (!confirm("Talabaga testni qayta topshirish imkoni berilsinmi?"))
         return;
+
       const resultId = result._id;
       const attemptId = result.attemptId._id;
 
